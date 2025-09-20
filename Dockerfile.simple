@@ -1,0 +1,42 @@
+# Simple Dockerfile for Next.js frontend
+FROM node:18-alpine
+
+# Install dependencies
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Configure npm for better network handling
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-timeout 300000
+
+# Install dependencies with retry logic
+RUN for i in 1 2 3; do npm install --no-audit --no-fund && break || sleep 10; done
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Set permissions
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Start the application
+CMD ["npm", "start"]

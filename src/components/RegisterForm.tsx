@@ -57,8 +57,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchToLogin 
       } else {
         setError(result.message || 'Registration failed');
       }
-    } catch (error: any) {
-      setError(error.message || 'Registration failed');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }

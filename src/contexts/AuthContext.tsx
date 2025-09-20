@@ -71,8 +71,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         return { success: false, message: response.message || 'Login failed' };
       }
-    } catch (error: any) {
-      return { success: false, message: error.message || 'Login failed' };
+    } catch (error: unknown) {
+      return { success: false, message: error instanceof Error ? error.message : 'Login failed' };
     } finally {
       setIsLoading(false);
     }
@@ -94,8 +94,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         return { success: false, message: response.message || 'Registration failed' };
       }
-    } catch (error: any) {
-      return { success: false, message: error.message || 'Registration failed' };
+    } catch (error: unknown) {
+      return { success: false, message: error instanceof Error ? error.message : 'Registration failed' };
     } finally {
       setIsLoading(false);
     }
